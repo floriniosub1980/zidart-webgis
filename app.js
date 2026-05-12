@@ -66,6 +66,11 @@ function getFeatureYear(feature) {
   return year || "Necunoscut";
 }
 
+function getLayerYear(layer) {
+  const year = (normalizeLayerName(layer).match(/20\d{2}/) || [])[0];
+  return year || "Necunoscut";
+}
+
 function sortLayers(layers) {
   return [...layers].sort((a, b) => {
     const ay = (a.match(/20\d{2}/) || [])[0];
@@ -228,14 +233,18 @@ function getColorMap(counts) {
 
 function renderLegendItems(container, colorMap, counts) {
   if (!container) return;
-  const active = state.activeLayer;
+  const activeLayer = state.activeLayer;
+  const activeYear = state.selectedYear;
   container.innerHTML = "";
   sortLayers(Object.keys(counts)).forEach((layer) => {
     const count = counts[layer];
+    const layerYear = getLayerYear(layer);
+    const isActive = activeLayer === layer || Boolean(activeYear && layerYear === activeYear);
+    const shouldDim = Boolean((activeLayer || activeYear) && !isActive);
     const li = document.createElement("li");
-    if (active === layer) {
+    if (isActive) {
       li.classList.add("active");
-    } else if (active) {
+    } else if (shouldDim) {
       li.classList.add("dimmed");
     }
     li.innerHTML = `
@@ -397,8 +406,13 @@ function resetAllFilters() {
 function applySearchInput() {
   if (!searchInputEl) return;
   const label = searchInputEl.value.trim();
-  state.selectedFeatureKey = state.featureSearchMap[label] || "";
+  const featureKey = state.featureSearchMap[label] || "";
+  state.selectedFeatureKey = featureKey;
   state.activeLayer = null;
+  if (featureKey) {
+    state.selectedYear = "";
+    syncControls();
+  }
   refreshUI();
 }
 
@@ -419,6 +433,15 @@ function closeLightbox() {
 resetFilterBtn.addEventListener("click", resetAllFilters);
 
 if (searchInputEl) {
+  searchInputEl.addEventListener("input", () => {
+    const label = searchInputEl.value.trim();
+    if (state.featureSearchMap[label]) {
+      applySearchInput();
+    } else if (!label) {
+      state.selectedFeatureKey = "";
+      refreshUI();
+    }
+  });
   searchInputEl.addEventListener("change", applySearchInput);
   searchInputEl.addEventListener("search", () => {
     if (!searchInputEl.value.trim()) {
