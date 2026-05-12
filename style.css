@@ -217,6 +217,7 @@ body {
   min-height: 290px;
 }
 
+.chart-legend,
 .legend-list {
   list-style: none;
   margin: 0;
@@ -225,6 +226,11 @@ body {
   gap: 10px;
 }
 
+.chart-legend {
+  margin-top: 14px;
+}
+
+.chart-legend li,
 .legend-list li {
   display: flex;
   gap: 12px;
@@ -234,16 +240,23 @@ body {
   background: rgba(79, 90, 62, 0.04);
   border: 1px solid rgba(79, 90, 62, 0.08);
   cursor: pointer;
-  transition: transform .18s ease, background .18s ease;
+  transition: transform .18s ease, background .18s ease, opacity .18s ease;
 }
 
+.chart-legend li:hover,
 .legend-list li:hover {
   background: rgba(79, 90, 62, 0.10);
   transform: translateY(-1px);
 }
 
+.chart-legend li.active,
 .legend-list li.active {
   outline: 2px solid rgba(79, 90, 62, 0.18);
+}
+
+.chart-legend li.dimmed,
+.legend-list li.dimmed {
+  opacity: .45;
 }
 
 .legend-swatch {
