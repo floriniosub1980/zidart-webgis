@@ -10,11 +10,11 @@ const state = {
   activeLayer: null,
   chart: null,
   layerCounts: {},
-  colorMap: {}
+  colorMap: {},
+  clusterGroup: null
 };
 
 const workCountEl = document.getElementById("workCount");
-const layerCountEl = document.getElementById("layerCount");
 const legendListEl = document.getElementById("legendList");
 const topbarSubtitleEl = document.getElementById("topbarSubtitle");
 const resetFilterBtn = document.getElementById("resetFilterBtn");
@@ -25,13 +25,21 @@ const map = L.map("map", {
 }).setView([46.57, 26.92], 11);
 
 L.tileLayer(
-  "https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png",
+  "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
   {
     attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
     subdomains: 'abcd',
     maxZoom: 20
   }
 ).addTo(map);
+
+state.clusterGroup = L.markerClusterGroup({
+  showCoverageOnHover: false,
+  spiderfyOnMaxZoom: true,
+  disableClusteringAtZoom: 16,
+  maxClusterRadius: 42
+});
+map.addLayer(state.clusterGroup);
 
 function normalizeLayerName(value) {
   return String(value || "Necategorizat").replace(/\s+/g, " ").trim();
@@ -66,11 +74,7 @@ function splitDescription(text) {
 
   const idx = match.index + (match[1] ? match[1].length : 0);
   const ro = cleaned.slice(0, idx).replace(/^(RO)\s*[:\-]?\s*/i, "").trim();
-  const en = cleaned
-    .slice(idx)
-    .replace(/^(EN|ENG)\s*[:\-]?\s*/i, "")
-    .trim();
-
+  const en = cleaned.slice(idx).replace(/^(EN|ENG)\s*[:\-]?\s*/i, "").trim();
   return { ro, en };
 }
 
@@ -85,6 +89,19 @@ function popupHtml(feature, color) {
   const p = feature.properties || {};
   const images = getImageUrls(p);
   const description = splitDescription(p.descriere);
+
+  const gallery = images.length
+    ? `
+      <div class="popup-section-title">Galerie foto</div>
+      <div class="popup-gallery">
+        ${images.map((img) => `
+          <a href="${img}" target="_blank" rel="noopener noreferrer" title="Deschide imaginea într-o filă nouă">
+            <img src="${img}" alt="${escapeAttr(p.titlu || "Imagine ZIDART")}" loading="lazy"
+                 onerror="this.closest('a').style.display='none'">
+          </a>`).join("")}
+      </div>`
+    : `<div class="popup-section-title">Galerie foto</div><div class="popup-empty">Nu există imagini disponibile pentru această lucrare.</div>`;
+
   const descriptionBlock = description.ro || description.en
     ? `
       <div class="popup-section-title">Descriere</div>
@@ -101,18 +118,6 @@ function popupHtml(feature, color) {
           </div>` : ""}
       </div>`
     : "";
-
-  const gallery = images.length
-    ? `
-      <div class="popup-section-title">Galerie foto</div>
-      <div class="popup-gallery">
-        ${images.map((img) => `
-          <a href="${img}" target="_blank" rel="noopener noreferrer" title="Deschide imaginea într-o filă nouă">
-            <img src="${img}" alt="${escapeAttr(p.titlu || "Imagine ZIDART")}" loading="lazy"
-                 onerror="this.closest('a').style.display='none'">
-          </a>`).join("")}
-      </div>`
-    : `<div class="popup-section-title">Galerie foto</div><div class="popup-empty">Nu există imagini disponibile pentru această lucrare.</div>`;
 
   return `
     <div class="popup-card">
@@ -139,8 +144,8 @@ function popupHtml(feature, color) {
             <div class="popup-value">${escapeHtml(p.adresa_lucrare)}</div>
           </div>` : ""}
         </div>
-        ${descriptionBlock}
         ${gallery}
+        ${descriptionBlock}
       </div>
     </div>
   `;
@@ -174,7 +179,8 @@ function makeMarker(feature, color) {
   marker.feature = feature;
   marker.bindPopup(popupHtml(feature, color), {
     className: "zidart-popup",
-    maxWidth: 440
+    maxWidth: 420,
+    autoPanPadding: [20, 20]
   });
   return marker;
 }
@@ -211,25 +217,23 @@ function updateLegend(colorMap, counts) {
   });
 }
 
-function updateStats(filteredFeatures, allCounts) {
+function updateStats(filteredFeatures) {
   workCountEl.textContent = filteredFeatures.length;
-  layerCountEl.textContent = Object.keys(allCounts).length;
   topbarSubtitleEl.textContent = state.activeLayer
     ? `Filtru activ: ${state.activeLayer}`
     : "Toate lucrările";
 }
 
 function renderMarkers(features, colorMap) {
-  state.markers.forEach((marker) => map.removeLayer(marker));
+  state.clusterGroup.clearLayers();
   state.markers = features.map((feature) => {
     const layer = normalizeLayerName(feature.properties?.layer);
-    const marker = makeMarker(feature, colorMap[layer]);
-    marker.addTo(map);
-    return marker;
+    return makeMarker(feature, colorMap[layer]);
   });
+  state.clusterGroup.addLayers(state.markers);
 
-  const group = L.featureGroup(state.markers);
   if (state.markers.length) {
+    const group = L.featureGroup(state.markers);
     map.fitBounds(group.getBounds().pad(0.12), { maxZoom: 14 });
   }
 }
@@ -286,7 +290,7 @@ function toggleLayerFilter(layer) {
 
 function refreshUI() {
   const filtered = getFilteredFeatures();
-  updateStats(filtered, state.layerCounts);
+  updateStats(filtered);
   updateLegend(state.colorMap, state.layerCounts);
   renderMarkers(filtered, state.colorMap);
 }
