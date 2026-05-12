@@ -56,13 +56,15 @@
     .zidart-popup .leaflet-popup-close-button { background: #111 !important; color: #fff !important; opacity: 1 !important; }
     .zidart-popup .leaflet-popup-content-wrapper { max-width: min(620px, calc(100vw - 32px)) !important; }
     .zidart-popup .leaflet-popup-content { width: min(560px, calc(100vw - 40px)) !important; }
+    .zidart-popup .popup-title { font-size: 23px !important; line-height: 1.12 !important; margin: 10px 0 6px !important; }
+    .zidart-popup .popup-hero { padding-top: 16px !important; padding-bottom: 14px !important; }
     .popup-section-title + .popup-grid:has(.popup-field.full + .popup-field.full) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .popup-section-title + .popup-grid:has(.popup-field.full + .popup-field.full) .popup-field.full { grid-column: auto !important; }
     .popup-section-title + .popup-grid .popup-value { font-size: 13px; line-height: 1.55; max-height: 230px; overflow-y: auto; padding-right: 4px; }
     .popup-gallery { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; gap: 8px !important; }
     .popup-gallery a { aspect-ratio: 1 / 1; display: flex !important; align-items: center; justify-content: center; overflow: hidden !important; border-radius: 12px !important; }
     .popup-gallery img { width: 100% !important; height: 100% !important; object-fit: contain !important; background: rgba(255,255,255,.72); border-radius: 12px !important; }
-    @media (max-width: 680px) { .chart-legend { grid-template-columns: 1fr; } .popup-gallery { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; } .popup-section-title + .popup-grid:has(.popup-field.full + .popup-field.full) { grid-template-columns: 1fr; } }
+    @media (max-width: 680px) { .chart-legend { grid-template-columns: 1fr; } .popup-gallery { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; } .popup-section-title + .popup-grid:has(.popup-field.full + .popup-field.full) { grid-template-columns: 1fr; } .zidart-popup .popup-title { font-size: 21px !important; } }
   </style>
 </head>
 <body>
