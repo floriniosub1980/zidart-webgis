@@ -18,7 +18,7 @@
     .sidebar { padding: 14px !important; gap: 10px !important; }
     .hero-card { padding: 16px !important; }
     .eyebrow { padding: 5px 10px !important; font-size: 11px !important; }
-    .hero-card h1 { margin: 10px 0 8px !important; font-size: 30px !important; line-height: 1 !important; }
+    .hero-card h1 { margin: 8px 0 7px !important; font-size: 25px !important; line-height: 1.04 !important; }
     .hero-text { font-size: 13px !important; line-height: 1.45 !important; margin: 0 !important; }
     .hero-meta { margin-top: 10px !important; gap: 6px !important; }
     .hero-meta span { padding: 6px 9px !important; font-size: 11px !important; }
@@ -32,7 +32,8 @@
     .filter-select:focus { border-color: rgba(79,90,62,.38); box-shadow: 0 0 0 4px rgba(79,90,62,.10); }
     .filter-hint { margin: -2px 0 0; color: var(--muted); font-size: 10.5px; line-height: 1.35; }
     .reset-wide { width: 100%; margin-top: 2px; }
-    .chart-wrap { min-height: 220px !important; }
+    .chart-wrap { min-height: 170px !important; height: 170px !important; max-height: 170px !important; display: flex; align-items: center; justify-content: center; }
+    .chart-wrap canvas { max-width: 170px !important; max-height: 170px !important; }
     .chart-legend { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px !important; margin-top: 10px !important; }
     .chart-legend li { gap: 8px !important; padding: 8px 9px !important; border-radius: 14px !important; }
     .legend-swatch { width: 11px !important; height: 11px !important; }
@@ -64,7 +65,7 @@
     .popup-gallery { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; gap: 8px !important; }
     .popup-gallery a { aspect-ratio: 1 / 1; display: flex !important; align-items: center; justify-content: center; overflow: hidden !important; border-radius: 12px !important; }
     .popup-gallery img { width: 100% !important; height: 100% !important; object-fit: contain !important; background: rgba(255,255,255,.72); border-radius: 12px !important; }
-    @media (max-width: 680px) { .chart-legend { grid-template-columns: 1fr; } .popup-gallery { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; } .popup-section-title + .popup-grid:has(.popup-field.full + .popup-field.full) { grid-template-columns: 1fr; } .zidart-popup .popup-title { font-size: 21px !important; } }
+    @media (max-width: 680px) { .chart-legend { grid-template-columns: 1fr; } .chart-wrap { height: 160px !important; min-height: 160px !important; } .chart-wrap canvas { max-width: 160px !important; max-height: 160px !important; } .popup-gallery { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; } .popup-section-title + .popup-grid:has(.popup-field.full + .popup-field.full) { grid-template-columns: 1fr; } .zidart-popup .popup-title { font-size: 21px !important; } }
   </style>
 </head>
 <body>
