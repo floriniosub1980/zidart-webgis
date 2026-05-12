@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ZIDART Dashboard</title>
+  <meta name="description" content="Dashboard WEBGIS modern pentru lucrările ZIDART." />
+  <link rel="preconnect" href="https://unpkg.com">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <div id="app">
+    <aside class="sidebar">
+      <section class="hero-card glass">
+        <div class="eyebrow">ZIDART</div>
+        <h1>ZIDART – Picturi murale</h1>
+        <p class="hero-text">
+          ZIDART este un proiect de regenerare urbană și socială prin artă stradală, educație și
+          interacțiuni culturale, conceput pentru a crea o platformă de dialog social și pentru
+          a aduce arta mai aproape de comunitate.
+        </p>
+        <div class="hero-meta">
+          <span>WEBGIS Dashboard</span>
+          <span>Gray OSM Basemap</span>
+        </div>
+      </section>
+
+      <section class="stat-grid">
+        <article class="stat-card glass">
+          <div class="stat-label">Număr lucrări</div>
+          <div class="stat-value" id="workCount">0</div>
+          <div class="stat-sub">din setul curent de date</div>
+        </article>
+        <article class="stat-card glass">
+          <div class="stat-label">Categorii layer</div>
+          <div class="stat-value" id="layerCount">0</div>
+          <div class="stat-sub">clasificare pentru legendă</div>
+        </article>
+      </section>
+
+      <section class="panel glass">
+        <div class="panel-head">
+          <h2>Împărțirea lucrărilor după layer</h2>
+          <button id="resetFilterBtn" class="ghost-btn" type="button">Resetează filtrul</button>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="layerChart" aria-label="Distribuția lucrărilor pe layer"></canvas>
+        </div>
+        <p class="panel-note">Click pe o felie sau pe legendă pentru a filtra harta.</p>
+      </section>
+
+      <section class="panel glass">
+        <div class="panel-head">
+          <h2>Legendă</h2>
+        </div>
+        <ul id="legendList" class="legend-list"></ul>
+      </section>
+    </aside>
+
+    <main class="map-shell">
+      <div class="topbar glass">
+        <div>
+          <div class="topbar-title">ZIDART Dashboard</div>
+          <div class="topbar-subtitle" id="topbarSubtitle">Toate lucrările</div>
+        </div>
+      </div>
+      <div id="map"></div>
+    </main>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>
