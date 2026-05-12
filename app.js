@@ -207,6 +207,7 @@ function getColorMap(counts) {
 }
 
 function renderLegendItems(container, colorMap, counts) {
+  if (!container) return;
   const active = state.activeLayer;
   container.innerHTML = "";
   sortLayers(Object.keys(counts)).forEach((layer) => {
@@ -231,9 +232,7 @@ function renderLegendItems(container, colorMap, counts) {
 
 function updateLegends(colorMap, counts) {
   renderLegendItems(legendListEl, colorMap, counts);
-  if (chartLegendEl) {
-    renderLegendItems(chartLegendEl, colorMap, counts);
-  }
+  renderLegendItems(chartLegendEl, colorMap, counts);
 }
 
 function updateStats(filteredFeatures) {
