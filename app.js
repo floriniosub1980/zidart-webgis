@@ -29,19 +29,13 @@ const lightboxEl = document.getElementById("imageLightbox");
 const lightboxImageEl = document.getElementById("lightboxImage");
 const lightboxCloseEl = document.getElementById("lightboxClose");
 
-const map = L.map("map", {
-  zoomControl: true,
-  minZoom: 6
-}).setView([46.57, 26.92], 11);
+const map = L.map("map", { zoomControl: true, minZoom: 6 }).setView([46.57, 26.92], 11);
 
-L.tileLayer(
-  "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
-  {
-    attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
-    subdomains: 'abcd',
-    maxZoom: 20
-  }
-).addTo(map);
+L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
+  attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+  subdomains: "abcd",
+  maxZoom: 20
+}).addTo(map);
 
 state.clusterGroup = L.markerClusterGroup({
   showCoverageOnHover: false,
@@ -62,13 +56,11 @@ function getFeatureKey(feature, index = 0) {
 
 function getFeatureYear(feature) {
   const layer = normalizeLayerName(feature.properties?.layer);
-  const year = (layer.match(/20\d{2}/) || [])[0];
-  return year || "Necunoscut";
+  return (layer.match(/20\d{2}/) || [])[0] || "Necunoscut";
 }
 
 function getLayerYear(layer) {
-  const year = (normalizeLayerName(layer).match(/20\d{2}/) || [])[0];
-  return year || "Necunoscut";
+  return (normalizeLayerName(layer).match(/20\d{2}/) || [])[0] || "Necunoscut";
 }
 
 function sortLayers(layers) {
@@ -76,13 +68,12 @@ function sortLayers(layers) {
     const ay = (a.match(/20\d{2}/) || [])[0];
     const by = (b.match(/20\d{2}/) || [])[0];
     if (ay && by && ay !== by) return Number(ay) - Number(by);
-    return a.localeCompare(b, 'ro');
+    return a.localeCompare(b, "ro");
   });
 }
 
 function splitDescription(text) {
   if (!text) return { ro: "", en: "" };
-
   const cleaned = String(text)
     .replace(/&lt;br\s*\/?&gt;/gi, "\n")
     .replace(/<br\s*\/?>/gi, "\n")
@@ -90,18 +81,14 @@ function splitDescription(text) {
     .replace(/\r/g, "\n")
     .replace(/\n{3,}/g, "\n\n")
     .trim();
-
   const markerRegex = /(\n|^|\s)(EN|ENG)\s*[:\-]?\s*(\n|\s)/i;
   const match = cleaned.match(markerRegex);
-
-  if (!match || typeof match.index !== 'number') {
-    return { ro: cleaned, en: "" };
-  }
-
+  if (!match || typeof match.index !== "number") return { ro: cleaned, en: "" };
   const idx = match.index + (match[1] ? match[1].length : 0);
-  const ro = cleaned.slice(0, idx).replace(/^(RO)\s*[:\-]?\s*/i, "").trim();
-  const en = cleaned.slice(idx).replace(/^(EN|ENG)\s*[:\-]?\s*/i, "").trim();
-  return { ro, en };
+  return {
+    ro: cleaned.slice(0, idx).replace(/^(RO)\s*[:\-]?\s*/i, "").trim(),
+    en: cleaned.slice(idx).replace(/^(EN|ENG)\s*[:\-]?\s*/i, "").trim()
+  };
 }
 
 function getImageUrls(properties) {
@@ -124,8 +111,7 @@ function escapeAttr(str) {
 }
 
 function linkifyText(str) {
-  const escaped = escapeHtml(str || "");
-  return escaped.replace(/(https?:\/\/[^\s<]+)/gi, (url) => {
+  return escapeHtml(str || "").replace(/(https?:\/\/[^\s<]+)/gi, (url) => {
     return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
   });
 }
@@ -136,8 +122,7 @@ function popupHtml(feature, color) {
   const description = splitDescription(p.descriere);
 
   const gallery = images.length
-    ? `
-      <div class="popup-section-title">Galerie foto</div>
+    ? `<div class="popup-section-title">Galerie foto</div>
       <div class="popup-gallery">
         ${images.map((img) => `
           <a href="${img}" data-lightbox-image="${escapeAttr(img)}" title="Deschide imaginea mărită">
@@ -148,58 +133,33 @@ function popupHtml(feature, color) {
     : `<div class="popup-section-title">Galerie foto</div><div class="popup-empty">Nu există imagini disponibile pentru această lucrare.</div>`;
 
   const descriptionBlock = description.ro || description.en
-    ? `
-      <div class="popup-section-title">Descriere</div>
+    ? `<div class="popup-section-title">Descriere</div>
       <div class="popup-grid">
-        ${description.ro ? `
-          <div class="popup-field full">
-            <span class="popup-label">RO</span>
-            <div class="popup-value">${linkifyText(description.ro)}</div>
-          </div>` : ""}
-        ${description.en ? `
-          <div class="popup-field full">
-            <span class="popup-label">EN</span>
-            <div class="popup-value">${linkifyText(description.en)}</div>
-          </div>` : ""}
+        ${description.ro ? `<div class="popup-field full"><span class="popup-label">RO</span><div class="popup-value">${linkifyText(description.ro)}</div></div>` : ""}
+        ${description.en ? `<div class="popup-field full"><span class="popup-label">EN</span><div class="popup-value">${linkifyText(description.en)}</div></div>` : ""}
       </div>`
     : "";
 
-  return `
-    <div class="popup-card">
-      <div class="popup-hero" style="box-shadow: inset 0 0 0 9999px rgba(0,0,0,.06);">
-        <span class="popup-badge" style="background:${color}22;border-color:${color}55;">ZIDART</span>
-        <div class="popup-title">${escapeHtml(p.titlu || "Lucrare")}</div>
-        <div class="popup-layer">${escapeHtml(normalizeLayerName(p.layer || ""))}</div>
-      </div>
-      <div class="popup-body">
-        <div class="popup-grid">
-          ${p.nume_artist ? `
-          <div class="popup-field">
-            <span class="popup-label">Nume artist</span>
-            <div class="popup-value">${escapeHtml(p.nume_artist)}</div>
-          </div>` : ""}
-          ${p.suprafata_lucrare ? `
-          <div class="popup-field">
-            <span class="popup-label">Suprafață lucrare</span>
-            <div class="popup-value">${escapeHtml(p.suprafata_lucrare)}</div>
-          </div>` : ""}
-          ${p.adresa_lucrare ? `
-          <div class="popup-field full">
-            <span class="popup-label">Adresă lucrare</span>
-            <div class="popup-value">${linkifyText(p.adresa_lucrare)}</div>
-          </div>` : ""}
-        </div>
-        ${gallery}
-        ${descriptionBlock}
-      </div>
+  return `<div class="popup-card">
+    <div class="popup-hero" style="box-shadow: inset 0 0 0 9999px rgba(0,0,0,.06);">
+      <span class="popup-badge" style="background:${color}22;border-color:${color}55;">ZIDART</span>
+      <div class="popup-title">${escapeHtml(p.titlu || "Lucrare")}</div>
+      <div class="popup-layer">${escapeHtml(normalizeLayerName(p.layer || ""))}</div>
     </div>
-  `;
+    <div class="popup-body">
+      <div class="popup-grid">
+        ${p.nume_artist ? `<div class="popup-field"><span class="popup-label">Nume artist</span><div class="popup-value">${escapeHtml(p.nume_artist)}</div></div>` : ""}
+        ${p.suprafata_lucrare ? `<div class="popup-field"><span class="popup-label">Suprafață lucrare</span><div class="popup-value">${escapeHtml(p.suprafata_lucrare)}</div></div>` : ""}
+        ${p.adresa_lucrare ? `<div class="popup-field full"><span class="popup-label">Adresă lucrare</span><div class="popup-value">${linkifyText(p.adresa_lucrare)}</div></div>` : ""}
+      </div>
+      ${gallery}
+      ${descriptionBlock}
+    </div>
+  </div>`;
 }
 
 function makeMarker(feature, color) {
   const coords = feature.geometry?.coordinates || [];
-  const lat = coords[1];
-  const lng = coords[0];
   const icon = L.divIcon({
     className: "",
     html: `<div class="zidart-marker" style="width:18px;height:18px;background:${color};"></div>`,
@@ -207,8 +167,7 @@ function makeMarker(feature, color) {
     iconAnchor: [9, 9],
     popupAnchor: [0, -12]
   });
-
-  const marker = L.marker([lat, lng], { icon });
+  const marker = L.marker([coords[1], coords[0]], { icon });
   marker.feature = feature;
   marker.bindPopup(popupHtml(feature, color), {
     className: "zidart-popup",
@@ -231,53 +190,17 @@ function getColorMap(counts) {
   return Object.fromEntries(entries.map((layer, i) => [layer, COLORS[i % COLORS.length]]));
 }
 
-function renderLegendItems(container, colorMap, counts) {
-  if (!container) return;
-  const activeLayer = state.activeLayer;
-  const activeYear = state.selectedYear;
-  container.innerHTML = "";
-  sortLayers(Object.keys(counts)).forEach((layer) => {
-    const count = counts[layer];
-    const layerYear = getLayerYear(layer);
-    const isActive = activeLayer === layer || Boolean(activeYear && layerYear === activeYear);
-    const shouldDim = Boolean((activeLayer || activeYear) && !isActive);
-    const li = document.createElement("li");
-    if (isActive) {
-      li.classList.add("active");
-    } else if (shouldDim) {
-      li.classList.add("dimmed");
-    }
-    li.innerHTML = `
-      <span class="legend-swatch" style="background:${colorMap[layer]}"></span>
-      <span class="legend-text">
-        <span class="legend-title">${escapeHtml(layer)}</span>
-        <span class="legend-sub">${count} lucrări</span>
-      </span>
-    `;
-    li.addEventListener("click", () => {
-      state.selectedYear = "";
-      state.selectedFeatureKey = "";
-      syncControls();
-      populateSearchOptions(getSearchOptionFeatures());
-      toggleLayerFilter(layer);
-    });
-    container.appendChild(li);
-  });
-}
-
-function updateLegends(colorMap, counts) {
-  renderLegendItems(legendListEl, colorMap, counts);
-  renderLegendItems(chartLegendEl, colorMap, counts);
-}
-
 function getAllFeatures() {
   return state.data?.features || [];
 }
 
 function getSearchOptionFeatures() {
-  const features = getAllFeatures();
-  if (!state.selectedYear) return features;
-  return features.filter((feature) => getFeatureYear(feature) === state.selectedYear);
+  return getAllFeatures().filter((feature) => {
+    const layer = normalizeLayerName(feature.properties?.layer);
+    if (state.selectedYear && getFeatureYear(feature) !== state.selectedYear) return false;
+    if (state.activeLayer && layer !== state.activeLayer) return false;
+    return true;
+  });
 }
 
 function populateSearchOptions(features) {
@@ -300,9 +223,7 @@ function populateYearOptions(features) {
     if (b === "Necunoscut") return -1;
     return Number(a) - Number(b);
   });
-  yearSelectEl.innerHTML = `<option value="">Toți anii</option>` + years.map((year) => {
-    return `<option value="${escapeAttr(year)}">${escapeHtml(year)}</option>`;
-  }).join("");
+  yearSelectEl.innerHTML = `<option value="">Toți anii</option>` + years.map((year) => `<option value="${escapeAttr(year)}">${escapeHtml(year)}</option>`).join("");
 }
 
 function populateFilters(features) {
@@ -318,6 +239,40 @@ function syncControls() {
   if (yearSelectEl) yearSelectEl.value = state.selectedYear;
 }
 
+function refreshSearchOptionsAndControls() {
+  populateSearchOptions(getSearchOptionFeatures());
+  syncControls();
+}
+
+function renderLegendItems(container, colorMap, counts) {
+  if (!container) return;
+  const activeLayer = state.activeLayer;
+  const activeYear = state.selectedYear;
+  container.innerHTML = "";
+  sortLayers(Object.keys(counts)).forEach((layer) => {
+    const count = counts[layer];
+    const layerYear = getLayerYear(layer);
+    const isActive = activeLayer === layer || Boolean(activeYear && layerYear === activeYear);
+    const shouldDim = Boolean((activeLayer || activeYear) && !isActive);
+    const li = document.createElement("li");
+    if (isActive) li.classList.add("active");
+    else if (shouldDim) li.classList.add("dimmed");
+    li.innerHTML = `<span class="legend-swatch" style="background:${colorMap[layer]}"></span>
+      <span class="legend-text"><span class="legend-title">${escapeHtml(layer)}</span><span class="legend-sub">${count} lucrări</span></span>`;
+    li.addEventListener("click", () => {
+      state.selectedYear = "";
+      state.selectedFeatureKey = "";
+      toggleLayerFilter(layer);
+    });
+    container.appendChild(li);
+  });
+}
+
+function updateLegends(colorMap, counts) {
+  renderLegendItems(legendListEl, colorMap, counts);
+  renderLegendItems(chartLegendEl, colorMap, counts);
+}
+
 function updateStats(filteredFeatures) {
   workCountEl.textContent = filteredFeatures.length;
   const parts = [];
@@ -327,6 +282,17 @@ function updateStats(filteredFeatures) {
   topbarSubtitleEl.textContent = parts.length ? `Filtru activ: ${parts.join(" · ")}` : "Toate lucrările";
 }
 
+function getFilteredFeatures() {
+  return getAllFeatures().filter((feature, index) => {
+    const layer = normalizeLayerName(feature.properties?.layer);
+    const key = getFeatureKey(feature, index);
+    if (state.selectedFeatureKey && key !== state.selectedFeatureKey) return false;
+    if (state.selectedYear && getFeatureYear(feature) !== state.selectedYear) return false;
+    if (state.activeLayer && layer !== state.activeLayer) return false;
+    return true;
+  });
+}
+
 function renderMarkers(features, colorMap) {
   state.clusterGroup.clearLayers();
   state.markers = features.map((feature) => {
@@ -334,7 +300,6 @@ function renderMarkers(features, colorMap) {
     return makeMarker(feature, colorMap[layer]);
   });
   state.clusterGroup.addLayers(state.markers);
-
   if (state.markers.length) {
     const group = L.featureGroup(state.markers);
     map.fitBounds(group.getBounds().pad(0.12), { maxZoom: state.selectedFeatureKey ? 18 : 14 });
@@ -344,57 +309,27 @@ function renderMarkers(features, colorMap) {
   }
 }
 
-function getFilteredFeatures() {
-  const features = getAllFeatures();
-  return features.filter((feature, index) => {
-    const layer = normalizeLayerName(feature.properties?.layer);
-    const key = getFeatureKey(feature, index);
-    const year = getFeatureYear(feature);
-    if (state.selectedFeatureKey && key !== state.selectedFeatureKey) return false;
-    if (state.selectedYear && year !== state.selectedYear) return false;
-    if (state.activeLayer && layer !== state.activeLayer) return false;
-    return true;
-  });
-}
-
 function buildChart(counts, colorMap) {
   const ctx = document.getElementById("layerChart");
   const labels = sortLayers(Object.keys(counts));
   const values = labels.map((l) => counts[l]);
   const colors = labels.map((l) => colorMap[l]);
-
   if (state.chart) state.chart.destroy();
-
   state.chart = new Chart(ctx, {
     type: "pie",
-    data: {
-      labels,
-      datasets: [{
-        data: values,
-        backgroundColor: colors,
-        borderColor: "#ffffff",
-        borderWidth: 2
-      }]
-    },
+    data: { labels, datasets: [{ data: values, backgroundColor: colors, borderColor: "#ffffff", borderWidth: 2 }] },
     options: {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
         legend: { display: false },
-        tooltip: {
-          callbacks: {
-            label: (context) => `${context.label}: ${context.raw}`
-          }
-        }
+        tooltip: { callbacks: { label: (context) => `${context.label}: ${context.raw}` } }
       },
       onClick: (_, elements) => {
         if (!elements.length) return;
-        const index = elements[0].index;
         state.selectedYear = "";
         state.selectedFeatureKey = "";
-        populateSearchOptions(getSearchOptionFeatures());
-        syncControls();
-        toggleLayerFilter(labels[index]);
+        toggleLayerFilter(labels[elements[0].index]);
       }
     }
   });
@@ -402,6 +337,7 @@ function buildChart(counts, colorMap) {
 
 function toggleLayerFilter(layer) {
   state.activeLayer = state.activeLayer === layer ? null : layer;
+  refreshSearchOptionsAndControls();
   refreshUI();
 }
 
@@ -416,16 +352,14 @@ function resetAllFilters() {
   state.activeLayer = null;
   state.selectedFeatureKey = "";
   state.selectedYear = "";
-  populateSearchOptions(getSearchOptionFeatures());
-  syncControls();
+  refreshSearchOptionsAndControls();
   refreshUI();
 }
 
 function applySearchInput() {
   if (!searchInputEl) return;
   const label = searchInputEl.value.trim();
-  const featureKey = state.featureSearchMap[label] || "";
-  state.selectedFeatureKey = featureKey;
+  state.selectedFeatureKey = state.featureSearchMap[label] || "";
   state.activeLayer = null;
   refreshUI();
 }
@@ -449,9 +383,8 @@ resetFilterBtn.addEventListener("click", resetAllFilters);
 if (searchInputEl) {
   searchInputEl.addEventListener("input", () => {
     const label = searchInputEl.value.trim();
-    if (state.featureSearchMap[label]) {
-      applySearchInput();
-    } else if (!label) {
+    if (state.featureSearchMap[label]) applySearchInput();
+    else if (!label) {
       state.selectedFeatureKey = "";
       refreshUI();
     }
@@ -470,8 +403,7 @@ if (yearSelectEl) {
     state.selectedYear = yearSelectEl.value;
     state.activeLayer = "";
     state.selectedFeatureKey = "";
-    populateSearchOptions(getSearchOptionFeatures());
-    syncControls();
+    refreshSearchOptionsAndControls();
     refreshUI();
   });
 }
