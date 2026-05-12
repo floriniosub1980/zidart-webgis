@@ -20,6 +20,7 @@
     .filter-field label { color: var(--muted); font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
     .filter-select { width: 100%; border: 1px solid rgba(79,90,62,.16); border-radius: 16px; background: rgba(255,255,255,.76); color: var(--forest); padding: 12px 14px; font: inherit; outline: none; }
     .filter-select:focus { border-color: rgba(79,90,62,.38); box-shadow: 0 0 0 4px rgba(79,90,62,.10); }
+    .filter-hint { margin: -2px 0 0; color: var(--muted); font-size: 11px; line-height: 1.4; }
     .reset-wide { width: 100%; margin-top: 4px; }
     .sidebar-footer { padding: 16px 18px; border-radius: 18px; background: rgba(255,255,255,.52); border: 1px solid rgba(33,49,36,.08); color: var(--muted); font-size: 12px; line-height: 1.6; }
     .sidebar-footer a { color: var(--forest); font-weight: 700; }
@@ -74,10 +75,10 @@
         </div>
         <div class="filters-grid">
           <div class="filter-field">
-            <label for="searchSelect">Caută după titlu și artist</label>
-            <select id="searchSelect" class="filter-select">
-              <option value="">Toate lucrările</option>
-            </select>
+            <label for="searchInput">Caută după titlu și artist</label>
+            <input id="searchInput" class="filter-select" list="worksDatalist" type="search" placeholder="Scrie sau alege o lucrare" autocomplete="off" />
+            <datalist id="worksDatalist"></datalist>
+            <p class="filter-hint">Poți scrie liber sau poți alege din lista de sugestii.</p>
           </div>
           <div class="filter-field">
             <label for="yearSelect">Filtrează după an</label>
@@ -101,8 +102,9 @@
       </section>
 
       <footer class="sidebar-footer">
-        Date și conținut: <a href="https://www.zidart.ro/" target="_blank" rel="noopener noreferrer">ZIDART</a>.
-        Publicare și componentă WEBGIS: Geo-Spatial.org / GitHub Pages.
+        Credit: <a href="https://www.zidart.ro/" target="_blank" rel="noopener noreferrer">ZIDART</a> /
+        Florin Iosub (<a href="https://geo-spatial.org/" target="_blank" rel="noopener noreferrer">geo-spatial.org</a>) /
+        <a href="https://pages.github.com/" target="_blank" rel="noopener noreferrer">GitHub Pages</a>.
       </footer>
     </aside>
 
