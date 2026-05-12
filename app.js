@@ -10,6 +10,7 @@ const state = {
   activeLayer: null,
   selectedFeatureKey: "",
   selectedYear: "",
+  featureSearchMap: {},
   chart: null,
   layerCounts: {},
   colorMap: {},
@@ -21,7 +22,8 @@ const legendListEl = document.getElementById("legendList");
 const chartLegendEl = document.getElementById("chartLegend");
 const topbarSubtitleEl = document.getElementById("topbarSubtitle");
 const resetFilterBtn = document.getElementById("resetFilterBtn");
-const searchSelectEl = document.getElementById("searchSelect");
+const searchInputEl = document.getElementById("searchInput");
+const worksDatalistEl = document.getElementById("worksDatalist");
 const yearSelectEl = document.getElementById("yearSelect");
 const lightboxEl = document.getElementById("imageLightbox");
 const lightboxImageEl = document.getElementById("lightboxImage");
@@ -55,7 +57,7 @@ function normalizeLayerName(value) {
 
 function getFeatureKey(feature, index = 0) {
   const p = feature.properties || {};
-  return String(p.gid || p.titlu || index);
+  return String(p.gid || `${p.titlu || "lucrare"}-${index}`);
 }
 
 function getFeatureYear(feature) {
@@ -259,13 +261,15 @@ function updateLegends(colorMap, counts) {
 }
 
 function populateFilters(features) {
-  if (searchSelectEl) {
+  if (worksDatalistEl) {
+    state.featureSearchMap = {};
     const sorted = [...features].sort((a, b) => String(a.properties?.titlu || "").localeCompare(String(b.properties?.titlu || ""), "ro"));
-    searchSelectEl.innerHTML = `<option value="">Toate lucrările</option>` + sorted.map((feature, index) => {
+    worksDatalistEl.innerHTML = sorted.map((feature, index) => {
       const p = feature.properties || {};
       const key = getFeatureKey(feature, index);
       const label = `${p.titlu || "Lucrare"}${p.nume_artist ? " — " + p.nume_artist : ""}`;
-      return `<option value="${escapeAttr(key)}">${escapeHtml(label)}</option>`;
+      state.featureSearchMap[label] = key;
+      return `<option value="${escapeAttr(label)}"></option>`;
     }).join("");
   }
 
@@ -282,7 +286,10 @@ function populateFilters(features) {
 }
 
 function syncControls() {
-  if (searchSelectEl) searchSelectEl.value = state.selectedFeatureKey;
+  if (searchInputEl) {
+    const selectedLabel = Object.keys(state.featureSearchMap).find((label) => state.featureSearchMap[label] === state.selectedFeatureKey) || "";
+    searchInputEl.value = selectedLabel;
+  }
   if (yearSelectEl) yearSelectEl.value = state.selectedYear;
 }
 
@@ -387,6 +394,14 @@ function resetAllFilters() {
   refreshUI();
 }
 
+function applySearchInput() {
+  if (!searchInputEl) return;
+  const label = searchInputEl.value.trim();
+  state.selectedFeatureKey = state.featureSearchMap[label] || "";
+  state.activeLayer = null;
+  refreshUI();
+}
+
 function openLightbox(url) {
   if (!lightboxEl || !lightboxImageEl) return;
   lightboxImageEl.src = url;
@@ -403,11 +418,13 @@ function closeLightbox() {
 
 resetFilterBtn.addEventListener("click", resetAllFilters);
 
-if (searchSelectEl) {
-  searchSelectEl.addEventListener("change", () => {
-    state.selectedFeatureKey = searchSelectEl.value;
-    state.activeLayer = null;
-    refreshUI();
+if (searchInputEl) {
+  searchInputEl.addEventListener("change", applySearchInput);
+  searchInputEl.addEventListener("search", () => {
+    if (!searchInputEl.value.trim()) {
+      state.selectedFeatureKey = "";
+      refreshUI();
+    }
   });
 }
 
