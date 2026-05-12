@@ -258,6 +258,7 @@ function renderLegendItems(container, colorMap, counts) {
       state.selectedYear = "";
       state.selectedFeatureKey = "";
       syncControls();
+      populateSearchOptions(getSearchOptionFeatures());
       toggleLayerFilter(layer);
     });
     container.appendChild(li);
@@ -269,29 +270,44 @@ function updateLegends(colorMap, counts) {
   renderLegendItems(chartLegendEl, colorMap, counts);
 }
 
-function populateFilters(features) {
-  if (worksDatalistEl) {
-    state.featureSearchMap = {};
-    const sorted = [...features].sort((a, b) => String(a.properties?.titlu || "").localeCompare(String(b.properties?.titlu || ""), "ro"));
-    worksDatalistEl.innerHTML = sorted.map((feature, index) => {
-      const p = feature.properties || {};
-      const key = getFeatureKey(feature, index);
-      const label = `${p.titlu || "Lucrare"}${p.nume_artist ? " — " + p.nume_artist : ""}`;
-      state.featureSearchMap[label] = key;
-      return `<option value="${escapeAttr(label)}"></option>`;
-    }).join("");
-  }
+function getAllFeatures() {
+  return state.data?.features || [];
+}
 
-  if (yearSelectEl) {
-    const years = [...new Set(features.map(getFeatureYear))].sort((a, b) => {
-      if (a === "Necunoscut") return 1;
-      if (b === "Necunoscut") return -1;
-      return Number(a) - Number(b);
-    });
-    yearSelectEl.innerHTML = `<option value="">Toți anii</option>` + years.map((year) => {
-      return `<option value="${escapeAttr(year)}">${escapeHtml(year)}</option>`;
-    }).join("");
-  }
+function getSearchOptionFeatures() {
+  const features = getAllFeatures();
+  if (!state.selectedYear) return features;
+  return features.filter((feature) => getFeatureYear(feature) === state.selectedYear);
+}
+
+function populateSearchOptions(features) {
+  if (!worksDatalistEl) return;
+  state.featureSearchMap = {};
+  const sorted = [...features].sort((a, b) => String(a.properties?.titlu || "").localeCompare(String(b.properties?.titlu || ""), "ro"));
+  worksDatalistEl.innerHTML = sorted.map((feature, index) => {
+    const p = feature.properties || {};
+    const key = getFeatureKey(feature, index);
+    const label = `${p.titlu || "Lucrare"}${p.nume_artist ? " — " + p.nume_artist : ""}`;
+    state.featureSearchMap[label] = key;
+    return `<option value="${escapeAttr(label)}"></option>`;
+  }).join("");
+}
+
+function populateYearOptions(features) {
+  if (!yearSelectEl) return;
+  const years = [...new Set(features.map(getFeatureYear))].sort((a, b) => {
+    if (a === "Necunoscut") return 1;
+    if (b === "Necunoscut") return -1;
+    return Number(a) - Number(b);
+  });
+  yearSelectEl.innerHTML = `<option value="">Toți anii</option>` + years.map((year) => {
+    return `<option value="${escapeAttr(year)}">${escapeHtml(year)}</option>`;
+  }).join("");
+}
+
+function populateFilters(features) {
+  populateSearchOptions(features);
+  populateYearOptions(features);
 }
 
 function syncControls() {
@@ -329,7 +345,7 @@ function renderMarkers(features, colorMap) {
 }
 
 function getFilteredFeatures() {
-  const features = state.data?.features || [];
+  const features = getAllFeatures();
   return features.filter((feature, index) => {
     const layer = normalizeLayerName(feature.properties?.layer);
     const key = getFeatureKey(feature, index);
@@ -376,6 +392,7 @@ function buildChart(counts, colorMap) {
         const index = elements[0].index;
         state.selectedYear = "";
         state.selectedFeatureKey = "";
+        populateSearchOptions(getSearchOptionFeatures());
         syncControls();
         toggleLayerFilter(labels[index]);
       }
@@ -399,6 +416,7 @@ function resetAllFilters() {
   state.activeLayer = null;
   state.selectedFeatureKey = "";
   state.selectedYear = "";
+  populateSearchOptions(getSearchOptionFeatures());
   syncControls();
   refreshUI();
 }
@@ -409,10 +427,6 @@ function applySearchInput() {
   const featureKey = state.featureSearchMap[label] || "";
   state.selectedFeatureKey = featureKey;
   state.activeLayer = null;
-  if (featureKey) {
-    state.selectedYear = "";
-    syncControls();
-  }
   refreshUI();
 }
 
@@ -456,6 +470,7 @@ if (yearSelectEl) {
     state.selectedYear = yearSelectEl.value;
     state.activeLayer = "";
     state.selectedFeatureKey = "";
+    populateSearchOptions(getSearchOptionFeatures());
     syncControls();
     refreshUI();
   });
