@@ -16,6 +16,7 @@ const state = {
 
 const workCountEl = document.getElementById("workCount");
 const legendListEl = document.getElementById("legendList");
+const chartLegendEl = document.getElementById("chartLegend");
 const topbarSubtitleEl = document.getElementById("topbarSubtitle");
 const resetFilterBtn = document.getElementById("resetFilterBtn");
 
@@ -99,11 +100,9 @@ function escapeAttr(str) {
 
 function linkifyText(str) {
   const escaped = escapeHtml(str || "");
-  return escaped.replace(
-    /(https?:\/\/[^
-\s<]+)/gi,
-    (url) => `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`
-  );
+  return escaped.replace(/(https?:\/\/[^\s<]+)/gi, (url) => {
+    return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
+  });
 }
 
 function popupHtml(feature, color) {
@@ -207,13 +206,17 @@ function getColorMap(counts) {
   return Object.fromEntries(entries.map((layer, i) => [layer, COLORS[i % COLORS.length]]));
 }
 
-function updateLegend(colorMap, counts) {
+function renderLegendItems(container, colorMap, counts) {
   const active = state.activeLayer;
-  legendListEl.innerHTML = "";
+  container.innerHTML = "";
   sortLayers(Object.keys(counts)).forEach((layer) => {
     const count = counts[layer];
     const li = document.createElement("li");
-    if (active === layer) li.classList.add("active");
+    if (active === layer) {
+      li.classList.add("active");
+    } else if (active) {
+      li.classList.add("dimmed");
+    }
     li.innerHTML = `
       <span class="legend-swatch" style="background:${colorMap[layer]}"></span>
       <span class="legend-text">
@@ -222,8 +225,15 @@ function updateLegend(colorMap, counts) {
       </span>
     `;
     li.addEventListener("click", () => toggleLayerFilter(layer));
-    legendListEl.appendChild(li);
+    container.appendChild(li);
   });
+}
+
+function updateLegends(colorMap, counts) {
+  renderLegendItems(legendListEl, colorMap, counts);
+  if (chartLegendEl) {
+    renderLegendItems(chartLegendEl, colorMap, counts);
+  }
 }
 
 function updateStats(filteredFeatures) {
@@ -277,23 +287,7 @@ function buildChart(counts, colorMap) {
       maintainAspectRatio: false,
       plugins: {
         legend: {
-          display: true,
-          position: "bottom",
-          labels: {
-            usePointStyle: true,
-            boxWidth: 10,
-            padding: 14,
-            color: "#213124",
-            font: {
-              size: 11,
-              family: "Inter"
-            }
-          },
-          onClick: (_, legendItem) => {
-            if (legendItem && legendItem.text) {
-              toggleLayerFilter(legendItem.text);
-            }
-          }
+          display: false
         },
         tooltip: {
           callbacks: {
@@ -318,7 +312,7 @@ function toggleLayerFilter(layer) {
 function refreshUI() {
   const filtered = getFilteredFeatures();
   updateStats(filtered);
-  updateLegend(state.colorMap, state.layerCounts);
+  updateLegends(state.colorMap, state.layerCounts);
   renderMarkers(filtered, state.colorMap);
 }
 
