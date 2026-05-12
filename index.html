@@ -40,6 +40,10 @@
     .legend-title { font-size: 12px !important; line-height: 1.25; }
     .legend-sub { font-size: 10.5px !important; }
     .panel-note { margin-top: 8px !important; font-size: 11px !important; }
+    .summary-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px !important; }
+    .summary-stat { padding: 10px 8px !important; border-radius: 16px; background: rgba(255,255,255,.68); border: 1px solid rgba(33,49,36,.08); box-shadow: 0 10px 28px rgba(24,33,27,.07); text-align: center; }
+    .summary-stat-value { display: block; font-family: "Playfair Display", Georgia, serif; font-size: 24px; line-height: 1; color: var(--forest); font-weight: 700; }
+    .summary-stat-label { display: block; margin-top: 5px; color: var(--muted); font-size: 10.5px; line-height: 1.15; }
     .site-stats { gap: 10px !important; }
     .site-stat { padding: 10px 12px !important; }
     .site-stat-value { font-size: 24px !important; }
@@ -65,7 +69,7 @@
     .popup-gallery { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; gap: 8px !important; }
     .popup-gallery a { aspect-ratio: 1 / 1; display: flex !important; align-items: center; justify-content: center; overflow: hidden !important; border-radius: 12px !important; }
     .popup-gallery img { width: 100% !important; height: 100% !important; object-fit: contain !important; background: rgba(255,255,255,.72); border-radius: 12px !important; }
-    @media (max-width: 680px) { .chart-legend { grid-template-columns: 1fr; } .chart-wrap { height: 160px !important; min-height: 160px !important; } .chart-wrap canvas { max-width: 160px !important; max-height: 160px !important; } .popup-gallery { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; } .popup-section-title + .popup-grid:has(.popup-field.full + .popup-field.full) { grid-template-columns: 1fr; } .zidart-popup .popup-title { font-size: 21px !important; } }
+    @media (max-width: 680px) { .chart-legend { grid-template-columns: 1fr; } .chart-wrap { height: 160px !important; min-height: 160px !important; } .chart-wrap canvas { max-width: 160px !important; max-height: 160px !important; } .summary-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px !important; } .summary-stat { padding: 8px 5px !important; } .summary-stat-value { font-size: 20px; } .summary-stat-label { font-size: 9.5px; } .popup-gallery { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; } .popup-section-title + .popup-grid:has(.popup-field.full + .popup-field.full) { grid-template-columns: 1fr; } .zidart-popup .popup-title { font-size: 21px !important; } }
   </style>
 </head>
 <body>
@@ -119,21 +123,18 @@
         <p class="panel-note">Click pe o felie sau pe legendă pentru a filtra harta.</p>
       </section>
 
-      <section class="stat-grid single">
-        <article class="stat-card">
-          <div class="stat-label">Număr lucrări</div>
-          <div class="stat-value" id="workCount">0</div>
+      <section class="summary-stats" aria-label="Statistici ZIDART">
+        <article class="summary-stat">
+          <span class="summary-stat-value" id="workCount">0</span>
+          <span class="summary-stat-label">Lucrări</span>
         </article>
-      </section>
-
-      <section class="site-stats">
-        <article class="site-stat">
-          <span class="site-stat-value">51</span>
-          <span class="site-stat-label">Artiști</span>
+        <article class="summary-stat">
+          <span class="summary-stat-value">51</span>
+          <span class="summary-stat-label">Artiști</span>
         </article>
-        <article class="site-stat">
-          <span class="site-stat-value">8756</span>
-          <span class="site-stat-label">Metri pătrați</span>
+        <article class="summary-stat">
+          <span class="summary-stat-value">8756</span>
+          <span class="summary-stat-label">Mp</span>
         </article>
       </section>
 
