@@ -85,6 +85,27 @@ function getImageUrls(properties) {
     .filter((v) => /^https?:\/\//i.test(v));
 }
 
+function escapeHtml(str) {
+  return String(str)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
+}
+
+function escapeAttr(str) {
+  return escapeHtml(str).replaceAll("'", "&#39;");
+}
+
+function linkifyText(str) {
+  const escaped = escapeHtml(str || "");
+  return escaped.replace(
+    /(https?:\/\/[^
+\s<]+)/gi,
+    (url) => `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`
+  );
+}
+
 function popupHtml(feature, color) {
   const p = feature.properties || {};
   const images = getImageUrls(p);
@@ -109,12 +130,12 @@ function popupHtml(feature, color) {
         ${description.ro ? `
           <div class="popup-field full">
             <span class="popup-label">RO</span>
-            <div class="popup-value">${escapeHtml(description.ro)}</div>
+            <div class="popup-value">${linkifyText(description.ro)}</div>
           </div>` : ""}
         ${description.en ? `
           <div class="popup-field full">
             <span class="popup-label">EN</span>
-            <div class="popup-value">${escapeHtml(description.en)}</div>
+            <div class="popup-value">${linkifyText(description.en)}</div>
           </div>` : ""}
       </div>`
     : "";
@@ -141,7 +162,7 @@ function popupHtml(feature, color) {
           ${p.adresa_lucrare ? `
           <div class="popup-field full">
             <span class="popup-label">Adresă lucrare</span>
-            <div class="popup-value">${escapeHtml(p.adresa_lucrare)}</div>
+            <div class="popup-value">${linkifyText(p.adresa_lucrare)}</div>
           </div>` : ""}
         </div>
         ${gallery}
@@ -149,18 +170,6 @@ function popupHtml(feature, color) {
       </div>
     </div>
   `;
-}
-
-function escapeHtml(str) {
-  return String(str)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;");
-}
-
-function escapeAttr(str) {
-  return escapeHtml(str).replaceAll("'", "&#39;");
 }
 
 function makeMarker(feature, color) {
@@ -267,7 +276,25 @@ function buildChart(counts, colorMap) {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
-        legend: { display: false },
+        legend: {
+          display: true,
+          position: "bottom",
+          labels: {
+            usePointStyle: true,
+            boxWidth: 10,
+            padding: 14,
+            color: "#213124",
+            font: {
+              size: 11,
+              family: "Inter"
+            }
+          },
+          onClick: (_, legendItem) => {
+            if (legendItem && legendItem.text) {
+              toggleLayerFilter(legendItem.text);
+            }
+          }
+        },
         tooltip: {
           callbacks: {
             label: (context) => `${context.label}: ${context.raw}`
