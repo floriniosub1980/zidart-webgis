@@ -427,6 +427,13 @@ body {
   white-space: pre-line;
 }
 
+.popup-value a {
+  color: var(--forest);
+  font-weight: 700;
+  text-decoration: underline;
+  word-break: break-word;
+}
+
 .popup-section-title {
   margin: 16px 0 10px;
   color: #5a6356;
