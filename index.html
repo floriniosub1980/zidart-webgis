@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>ZIDART Dashboard</title>
   <meta name="description" content="Dashboard WEBGIS modern pentru lucrările ZIDART." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
   <link rel="preconnect" href="https://unpkg.com">
   <link rel="preconnect" href="https://cdn.jsdelivr.net">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -14,34 +17,50 @@
 <body>
   <div id="app">
     <aside class="sidebar">
-      <section class="hero-card glass">
+      <section class="hero-card">
         <div class="eyebrow">ZIDART</div>
-        <h1>ZIDART – Picturi murale</h1>
+        <h1>În căutarea sufletului perete</h1>
         <p class="hero-text">
-          ZIDART este un proiect de regenerare urbană și socială prin artă stradală, educație și
-          interacțiuni culturale, conceput pentru a crea o platformă de dialog social și pentru
-          a aduce arta mai aproape de comunitate.
+          ZIDART este un proiect de regenerare urbană și socială prin artă stradală, educație și interacțiuni culturale,
+          conceput pentru a crea o platformă de dialog social care să inspire oamenii să fie prezenți în comunitate și
+          să participe la viața culturală a orașului.
         </p>
         <div class="hero-meta">
-          <span>WEBGIS Dashboard</span>
-          <span>Gray OSM Basemap</span>
+          <span>Bacău</span>
+          <span>Street Art Festival</span>
+          <span>Regenerare urbană</span>
         </div>
       </section>
 
+      <section class="site-stats">
+        <article class="site-stat">
+          <span class="site-stat-value">57</span>
+          <span class="site-stat-label">Artiști</span>
+        </article>
+        <article class="site-stat">
+          <span class="site-stat-value">7500</span>
+          <span class="site-stat-label">Metri pătrați</span>
+        </article>
+        <article class="site-stat">
+          <span class="site-stat-value">60</span>
+          <span class="site-stat-label">Picturi murale</span>
+        </article>
+      </section>
+
       <section class="stat-grid">
-        <article class="stat-card glass">
+        <article class="stat-card">
           <div class="stat-label">Număr lucrări</div>
           <div class="stat-value" id="workCount">0</div>
           <div class="stat-sub">din setul curent de date</div>
         </article>
-        <article class="stat-card glass">
+        <article class="stat-card">
           <div class="stat-label">Categorii layer</div>
           <div class="stat-value" id="layerCount">0</div>
           <div class="stat-sub">clasificare pentru legendă</div>
         </article>
       </section>
 
-      <section class="panel glass">
+      <section class="panel">
         <div class="panel-head">
           <h2>Împărțirea lucrărilor după layer</h2>
           <button id="resetFilterBtn" class="ghost-btn" type="button">Resetează filtrul</button>
@@ -52,7 +71,7 @@
         <p class="panel-note">Click pe o felie sau pe legendă pentru a filtra harta.</p>
       </section>
 
-      <section class="panel glass">
+      <section class="panel">
         <div class="panel-head">
           <h2>Legendă</h2>
         </div>
@@ -61,7 +80,7 @@
     </aside>
 
     <main class="map-shell">
-      <div class="topbar glass">
+      <div class="topbar">
         <div>
           <div class="topbar-title">ZIDART Dashboard</div>
           <div class="topbar-subtitle" id="topbarSubtitle">Toate lucrările</div>
