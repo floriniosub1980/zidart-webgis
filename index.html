@@ -10,8 +10,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
   <link rel="preconnect" href="https://unpkg.com">
   <link rel="preconnect" href="https://cdn.jsdelivr.net">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">
   <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
@@ -23,7 +24,8 @@
         <p class="hero-text">
           ZIDART este un proiect de regenerare urbană și socială prin artă stradală, educație și interacțiuni culturale,
           conceput pentru a crea o platformă de dialog social care să inspire oamenii să fie prezenți în comunitate și
-          să participe la viața culturală a orașului.
+          să participe la viața culturală a orașului. Descoperă proiectul complet pe
+          <a class="hero-link" href="https://www.zidart.ro/" target="_blank" rel="noopener noreferrer">zidart.ro</a>.
         </p>
         <div class="hero-meta">
           <span>Bacău</span>
@@ -34,39 +36,29 @@
 
       <section class="site-stats">
         <article class="site-stat">
-          <span class="site-stat-value">57</span>
+          <span class="site-stat-value">51</span>
           <span class="site-stat-label">Artiști</span>
         </article>
         <article class="site-stat">
-          <span class="site-stat-value">7500</span>
+          <span class="site-stat-value">8756</span>
           <span class="site-stat-label">Metri pătrați</span>
-        </article>
-        <article class="site-stat">
-          <span class="site-stat-value">60</span>
-          <span class="site-stat-label">Picturi murale</span>
         </article>
       </section>
 
-      <section class="stat-grid">
+      <section class="stat-grid single">
         <article class="stat-card">
           <div class="stat-label">Număr lucrări</div>
           <div class="stat-value" id="workCount">0</div>
-          <div class="stat-sub">din setul curent de date</div>
-        </article>
-        <article class="stat-card">
-          <div class="stat-label">Categorii layer</div>
-          <div class="stat-value" id="layerCount">0</div>
-          <div class="stat-sub">clasificare pentru legendă</div>
         </article>
       </section>
 
       <section class="panel">
         <div class="panel-head">
-          <h2>Împărțirea lucrărilor după layer</h2>
+          <h2>Distribuția lucrărilor după anul realizării</h2>
           <button id="resetFilterBtn" class="ghost-btn" type="button">Resetează filtrul</button>
         </div>
         <div class="chart-wrap">
-          <canvas id="layerChart" aria-label="Distribuția lucrărilor pe layer"></canvas>
+          <canvas id="layerChart" aria-label="Distribuția lucrărilor după anul realizării"></canvas>
         </div>
         <p class="panel-note">Click pe o felie sau pe legendă pentru a filtra harta.</p>
       </section>
@@ -90,8 +82,8 @@
     </main>
   </div>
 
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
   <script src="./app.js"></script>
 </body>
