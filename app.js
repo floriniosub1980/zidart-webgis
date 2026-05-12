@@ -8,6 +8,8 @@ const state = {
   data: null,
   markers: [],
   activeLayer: null,
+  selectedFeatureKey: "",
+  selectedYear: "",
   chart: null,
   layerCounts: {},
   colorMap: {},
@@ -19,6 +21,11 @@ const legendListEl = document.getElementById("legendList");
 const chartLegendEl = document.getElementById("chartLegend");
 const topbarSubtitleEl = document.getElementById("topbarSubtitle");
 const resetFilterBtn = document.getElementById("resetFilterBtn");
+const searchSelectEl = document.getElementById("searchSelect");
+const yearSelectEl = document.getElementById("yearSelect");
+const lightboxEl = document.getElementById("imageLightbox");
+const lightboxImageEl = document.getElementById("lightboxImage");
+const lightboxCloseEl = document.getElementById("lightboxClose");
 
 const map = L.map("map", {
   zoomControl: true,
@@ -44,6 +51,17 @@ map.addLayer(state.clusterGroup);
 
 function normalizeLayerName(value) {
   return String(value || "Necategorizat").replace(/\s+/g, " ").trim();
+}
+
+function getFeatureKey(feature, index = 0) {
+  const p = feature.properties || {};
+  return String(p.gid || p.titlu || index);
+}
+
+function getFeatureYear(feature) {
+  const layer = normalizeLayerName(feature.properties?.layer);
+  const year = (layer.match(/20\d{2}/) || [])[0];
+  return year || "Necunoscut";
 }
 
 function sortLayers(layers) {
@@ -115,7 +133,7 @@ function popupHtml(feature, color) {
       <div class="popup-section-title">Galerie foto</div>
       <div class="popup-gallery">
         ${images.map((img) => `
-          <a href="${img}" target="_blank" rel="noopener noreferrer" title="Deschide imaginea într-o filă nouă">
+          <a href="${img}" data-lightbox-image="${escapeAttr(img)}" title="Deschide imaginea mărită">
             <img src="${img}" alt="${escapeAttr(p.titlu || "Imagine ZIDART")}" loading="lazy"
                  onerror="this.closest('a').style.display='none'">
           </a>`).join("")}
@@ -225,7 +243,12 @@ function renderLegendItems(container, colorMap, counts) {
         <span class="legend-sub">${count} lucrări</span>
       </span>
     `;
-    li.addEventListener("click", () => toggleLayerFilter(layer));
+    li.addEventListener("click", () => {
+      state.selectedYear = "";
+      state.selectedFeatureKey = "";
+      syncControls();
+      toggleLayerFilter(layer);
+    });
     container.appendChild(li);
   });
 }
@@ -235,11 +258,41 @@ function updateLegends(colorMap, counts) {
   renderLegendItems(chartLegendEl, colorMap, counts);
 }
 
+function populateFilters(features) {
+  if (searchSelectEl) {
+    const sorted = [...features].sort((a, b) => String(a.properties?.titlu || "").localeCompare(String(b.properties?.titlu || ""), "ro"));
+    searchSelectEl.innerHTML = `<option value="">Toate lucrările</option>` + sorted.map((feature, index) => {
+      const p = feature.properties || {};
+      const key = getFeatureKey(feature, index);
+      const label = `${p.titlu || "Lucrare"}${p.nume_artist ? " — " + p.nume_artist : ""}`;
+      return `<option value="${escapeAttr(key)}">${escapeHtml(label)}</option>`;
+    }).join("");
+  }
+
+  if (yearSelectEl) {
+    const years = [...new Set(features.map(getFeatureYear))].sort((a, b) => {
+      if (a === "Necunoscut") return 1;
+      if (b === "Necunoscut") return -1;
+      return Number(a) - Number(b);
+    });
+    yearSelectEl.innerHTML = `<option value="">Toți anii</option>` + years.map((year) => {
+      return `<option value="${escapeAttr(year)}">${escapeHtml(year)}</option>`;
+    }).join("");
+  }
+}
+
+function syncControls() {
+  if (searchSelectEl) searchSelectEl.value = state.selectedFeatureKey;
+  if (yearSelectEl) yearSelectEl.value = state.selectedYear;
+}
+
 function updateStats(filteredFeatures) {
   workCountEl.textContent = filteredFeatures.length;
-  topbarSubtitleEl.textContent = state.activeLayer
-    ? `Filtru activ: ${state.activeLayer}`
-    : "Toate lucrările";
+  const parts = [];
+  if (state.selectedFeatureKey) parts.push("lucrare selectată");
+  if (state.selectedYear) parts.push(`an: ${state.selectedYear}`);
+  if (state.activeLayer) parts.push(`filtru grafic: ${state.activeLayer}`);
+  topbarSubtitleEl.textContent = parts.length ? `Filtru activ: ${parts.join(" · ")}` : "Toate lucrările";
 }
 
 function renderMarkers(features, colorMap) {
@@ -252,14 +305,24 @@ function renderMarkers(features, colorMap) {
 
   if (state.markers.length) {
     const group = L.featureGroup(state.markers);
-    map.fitBounds(group.getBounds().pad(0.12), { maxZoom: 14 });
+    map.fitBounds(group.getBounds().pad(0.12), { maxZoom: state.selectedFeatureKey ? 18 : 14 });
+    if (state.selectedFeatureKey && state.markers.length === 1) {
+      setTimeout(() => state.markers[0].openPopup(), 250);
+    }
   }
 }
 
 function getFilteredFeatures() {
   const features = state.data?.features || [];
-  if (!state.activeLayer) return features;
-  return features.filter((f) => normalizeLayerName(f.properties?.layer) === state.activeLayer);
+  return features.filter((feature, index) => {
+    const layer = normalizeLayerName(feature.properties?.layer);
+    const key = getFeatureKey(feature, index);
+    const year = getFeatureYear(feature);
+    if (state.selectedFeatureKey && key !== state.selectedFeatureKey) return false;
+    if (state.selectedYear && year !== state.selectedYear) return false;
+    if (state.activeLayer && layer !== state.activeLayer) return false;
+    return true;
+  });
 }
 
 function buildChart(counts, colorMap) {
@@ -285,9 +348,7 @@ function buildChart(counts, colorMap) {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
-        legend: {
-          display: false
-        },
+        legend: { display: false },
         tooltip: {
           callbacks: {
             label: (context) => `${context.label}: ${context.raw}`
@@ -297,6 +358,9 @@ function buildChart(counts, colorMap) {
       onClick: (_, elements) => {
         if (!elements.length) return;
         const index = elements[0].index;
+        state.selectedYear = "";
+        state.selectedFeatureKey = "";
+        syncControls();
         toggleLayerFilter(labels[index]);
       }
     }
@@ -315,17 +379,74 @@ function refreshUI() {
   renderMarkers(filtered, state.colorMap);
 }
 
-resetFilterBtn.addEventListener("click", () => {
+function resetAllFilters() {
   state.activeLayer = null;
+  state.selectedFeatureKey = "";
+  state.selectedYear = "";
+  syncControls();
   refreshUI();
+}
+
+function openLightbox(url) {
+  if (!lightboxEl || !lightboxImageEl) return;
+  lightboxImageEl.src = url;
+  lightboxEl.classList.add("open");
+  lightboxEl.setAttribute("aria-hidden", "false");
+}
+
+function closeLightbox() {
+  if (!lightboxEl || !lightboxImageEl) return;
+  lightboxEl.classList.remove("open");
+  lightboxEl.setAttribute("aria-hidden", "true");
+  lightboxImageEl.src = "";
+}
+
+resetFilterBtn.addEventListener("click", resetAllFilters);
+
+if (searchSelectEl) {
+  searchSelectEl.addEventListener("change", () => {
+    state.selectedFeatureKey = searchSelectEl.value;
+    state.activeLayer = null;
+    refreshUI();
+  });
+}
+
+if (yearSelectEl) {
+  yearSelectEl.addEventListener("change", () => {
+    state.selectedYear = yearSelectEl.value;
+    state.activeLayer = "";
+    state.selectedFeatureKey = "";
+    syncControls();
+    refreshUI();
+  });
+}
+
+if (lightboxCloseEl) lightboxCloseEl.addEventListener("click", closeLightbox);
+if (lightboxEl) {
+  lightboxEl.addEventListener("click", (event) => {
+    if (event.target === lightboxEl) closeLightbox();
+  });
+}
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") closeLightbox();
+});
+
+document.addEventListener("click", (event) => {
+  const link = event.target.closest("a[data-lightbox-image]");
+  if (!link) return;
+  event.preventDefault();
+  openLightbox(link.dataset.lightboxImage || link.href);
 });
 
 fetch("./zidart.geojson")
   .then((response) => response.json())
   .then((data) => {
     state.data = data;
-    state.layerCounts = computeLayerCounts(data.features || []);
+    const features = data.features || [];
+    state.layerCounts = computeLayerCounts(features);
     state.colorMap = getColorMap(state.layerCounts);
+    populateFilters(features);
     buildChart(state.layerCounts, state.colorMap);
     refreshUI();
   })
