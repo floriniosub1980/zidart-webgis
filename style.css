@@ -362,13 +362,38 @@ body {
   background: #f8f4ec;
 }
 
+.zidart-popup .leaflet-popup-close-button {
+  top: 12px;
+  right: 12px;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  background: rgba(33, 49, 36, 0.92);
+  color: #fff !important;
+  font-size: 24px;
+  line-height: 31px;
+  text-align: center;
+  font-weight: 800;
+  box-shadow: 0 8px 22px rgba(0,0,0,.28);
+  z-index: 20;
+  opacity: 1;
+}
+
+.zidart-popup .leaflet-popup-close-button:hover,
+.zidart-popup .leaflet-popup-close-button:focus {
+  background: #000;
+  color: #fff !important;
+  transform: scale(1.06);
+  text-decoration: none;
+}
+
 .popup-card {
   color: var(--charcoal);
   background: linear-gradient(180deg, #fbf8f2 0%, #f3ecdf 100%);
 }
 
 .popup-hero {
-  padding: 20px 18px 18px;
+  padding: 20px 58px 18px 18px;
   background:
     radial-gradient(circle at top right, rgba(79, 90, 62, 0.12), transparent 38%),
     linear-gradient(135deg, #f8f4ec 0%, #efe5d5 100%);
