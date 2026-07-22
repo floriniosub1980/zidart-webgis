@@ -130,7 +130,7 @@ function popupHtml(feature, color) {
   const description = splitDescription(p.descriere);
   const mapsUrl = getMapsUrl(feature);
   const mapsButton = mapsUrl
-    ? `<a href="${mapsUrl}" target="_blank" rel="noopener noreferrer" style="display:flex;align-items:center;justify-content:center;margin:12px 0 2px;padding:11px 14px;border-radius:999px;background:#213124;color:#fff;text-decoration:none;font-weight:800;font-size:13px;box-shadow:0 10px 24px rgba(33,49,36,.18);">Mergi la locatie in Google Maps</a>`
+    ? `<a href="${mapsUrl}" target="_blank" rel="noopener noreferrer" style="display:flex;align-items:center;justify-content:center;margin:12px 0 2px;padding:11px 14px;border-radius:999px;background:#213124;color:#fff;text-decoration:none;font-weight:800;font-size:13px;box-shadow:0 10px 24px rgba(33,49,36,.18);">Mergi la locație folosind Google Maps</a>`
     : "";
 
   const gallery = images.length
