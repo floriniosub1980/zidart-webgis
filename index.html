@@ -22,7 +22,8 @@
     .hero-text { font-size: 13px !important; line-height: 1.45 !important; margin: 0 !important; }
     .hero-meta { margin-top: 10px !important; gap: 6px !important; }
     .hero-meta span { padding: 6px 9px !important; font-size: 11px !important; }
-    .topbar { top: 8px !important; left: 54px !important; right: auto !important; width: max-content !important; max-width: calc(100% - 62px) !important; padding: 12px 16px !important; border-radius: 18px !important; z-index: 650 !important; }
+    .topbar { top: 8px !important; left: 54px !important; right: auto !important; width: max-content !important; max-width: calc(100% - 62px) !important; padding: 12px 16px !important; border-radius: 18px !important; z-index: 650 !important; transition: opacity .18s ease, transform .18s ease; }
+    .map-shell.popup-open .topbar { opacity: 0; transform: translateY(-12px); pointer-events: none; }
     .topbar-title { white-space: nowrap; font-size: clamp(18px, 2.2vw, 28px) !important; line-height: 1.08; }
     .topbar-subtitle { margin-top: 3px !important; }
     .panel { padding: 14px !important; }
