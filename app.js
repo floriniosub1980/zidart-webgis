@@ -116,10 +116,22 @@ function linkifyText(str) {
   });
 }
 
+function getMapsUrl(feature) {
+  const coords = feature.geometry?.coordinates || [];
+  const lng = Number(coords[0]);
+  const lat = Number(coords[1]);
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return "";
+  return `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+}
+
 function popupHtml(feature, color) {
   const p = feature.properties || {};
   const images = getImageUrls(p);
   const description = splitDescription(p.descriere);
+  const mapsUrl = getMapsUrl(feature);
+  const mapsButton = mapsUrl
+    ? `<a href="${mapsUrl}" target="_blank" rel="noopener noreferrer" style="display:flex;align-items:center;justify-content:center;margin:12px 0 2px;padding:11px 14px;border-radius:999px;background:#213124;color:#fff;text-decoration:none;font-weight:800;font-size:13px;box-shadow:0 10px 24px rgba(33,49,36,.18);">Mergi la locatie in Google Maps</a>`
+    : "";
 
   const gallery = images.length
     ? `<div class="popup-section-title">Galerie foto</div>
@@ -152,6 +164,7 @@ function popupHtml(feature, color) {
         ${p.suprafata_lucrare ? `<div class="popup-field"><span class="popup-label">Suprafață lucrare</span><div class="popup-value">${escapeHtml(p.suprafata_lucrare)}</div></div>` : ""}
         ${p.adresa_lucrare ? `<div class="popup-field full"><span class="popup-label">Adresă lucrare</span><div class="popup-value">${linkifyText(p.adresa_lucrare)}</div></div>` : ""}
       </div>
+      ${mapsButton}
       ${gallery}
       ${descriptionBlock}
     </div>
