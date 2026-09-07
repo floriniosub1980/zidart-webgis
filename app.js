@@ -31,10 +31,9 @@ const lightboxCloseEl = document.getElementById("lightboxClose");
 
 const map = L.map("map", { zoomControl: true, minZoom: 6 }).setView([46.57, 26.92], 11);
 
-L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
-  attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
-  subdomains: "abcd",
-  maxZoom: 20
+L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors',
+  maxZoom: 19
 }).addTo(map);
 
 state.clusterGroup = L.markerClusterGroup({
